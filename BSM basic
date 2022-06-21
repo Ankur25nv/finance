@@ -3,15 +3,22 @@ import numpy as np
 from scipy.stats import norm
 
 #define variables
-r = 0.01
-S = 30
-K = 40
-T = 240/365
-sigma = 0.03
+Rate = float(input('Rate : '))
+Price = float(input('Price : '))
+Strike = float(input('Strike Price : '))
+Time = int(input('Time to expiry in days : '))
+Volatility = float(input('\nVolatility(Sigma) : '))
+OptionType = input('Option type, either c for Call or p for Put : ')
+#Default inputs for which expected output is 0.51
+#r= 0.01
+#S = 30
+#K = 40
+#T = 240/365
+#sigma = 0.3
 
 #function for BSM with type representing Call or Put Option
 
-def blackScholes(r, S, K, T, sigma, type="c"):
+def blackScholes(r, S, K, T, sigma, type):
     "Calculate BS option price of call/put"
     d1 = (np.log(S/K) + (r + sigma**2/2)*T)/(sigma*np.sqrt(T))
     d2 = d1 - sigma*np.sqrt(T)
@@ -23,4 +30,4 @@ def blackScholes(r, S, K, T, sigma, type="c"):
         return price
     except:
         print("Please confirm option type, either 'c' for Call or 'p' for Put!")
-print("Option Price is ", round(blackScholes(r, S , K, T, sigma, type="c"),2))        
+print("Option Price is ", round(blackScholes(Rate, Price , Strike, (Time/365), Volatility, OptionType),2))
