@@ -1,0 +1,114 @@
+#Implementation of Black scholes using Python
+from secrets import choice
+import numpy as np
+from scipy.stats import norm
+from py_vollib.black_scholes.greeks.analytical import delta, gamma, vega, theta, rho
+
+#define variables
+# Rate = float(input2('Rate : '))
+# Price = float(input('Price : '))
+# Strike = float(input('Strike Price : '))
+# Time = int(input('Time to expiry in days : '))
+# Volatility = float(input('Volatility(Sigma) : '))
+# OptionType = input('Option type, either c for Call or p for Put : ')
+#Default inputs for which expected output is 0.51
+r= 0.01
+S = 30
+K = 40
+T = 240/365
+sigma = 0.3
+ch = int(input("What do you want to Calculate? \n1. Option price\n2. Delta \n3. Gamma\n4. Vega\n5. Theta\n6. Rho\n7. All\nPlease enter Your choice: "))
+print("---------------------------------")
+def black_scholes(r, S, K, T, sigma, type):
+        "Calculate BS option price of call/put"
+        d1 = (np.log(S/K) + (r + sigma**2/2)*T)/(sigma*np.sqrt(T))
+        d2 = d1 - sigma*np.sqrt(T)
+        try:
+            if type == "c":
+                price = S*norm.cdf(d1, 0, 1) - K*np.exp(-r*T)*norm.cdf(d2, 0, 1)
+            elif type == "p":
+                price = K*np.exp(-r*T)*norm.cdf(-d2, 0, 1) - S*norm.cdf(-d1, 0, 1)
+            return price
+        except:
+            print("Please confirm option type, either 'c' for Call or 'p' for Put!")
+
+def delta_calc(r, S, K, T, sigma, type="c"):
+    "Calculate delta of an option"
+    d1 = (np.log(S/K) + (r + sigma**2/2)*T)/(sigma*np.sqrt(T))
+    try:
+        if type == "c":
+            delta_calc = norm.cdf(d1, 0, 1)
+        elif type == "p":
+            delta_calc = -norm.cdf(-d1, 0, 1)
+        return delta_calc
+    except:
+        print("Please confirm option type, either 'c' for Call or 'p' for Put!")
+
+def gamma_calc(r, S, K, T, sigma, type="c"):
+    "Calculate gamma of a option"
+    d1 = (np.log(S/K) + (r + sigma**2/2)*T)/(sigma*np.sqrt(T))
+    d2 = d1 - sigma*np.sqrt(T)
+    try:
+        gamma_calc = norm.pdf(d1, 0, 1)/(S*sigma*np.sqrt(T))
+        return gamma_calc
+    except:
+        print("Please confirm option type, either 'c' for Call or 'p' for Put!")
+
+def vega_calc(r, S, K, T, sigma, type="c"):
+    "Calculate BS price of call/put"
+    d1 = (np.log(S/K) + (r + sigma**2/2)*T)/(sigma*np.sqrt(T))
+    d2 = d1 - sigma*np.sqrt(T)
+    try:
+        vega_calc = S*norm.pdf(d1, 0, 1)*np.sqrt(T)
+        return vega_calc*0.01
+    except:
+        print("Please confirm option type, either 'c' for Call or 'p' for Put!")
+
+def theta_calc(r, S, K, T, sigma, type="c"):
+    "Calculate BS price of call/put"
+    d1 = (np.log(S/K) + (r + sigma**2/2)*T)/(sigma*np.sqrt(T))
+    d2 = d1 - sigma*np.sqrt(T)
+    try:
+        if type == "c":
+            theta_calc = -S*norm.pdf(d1, 0, 1)*sigma/(2*np.sqrt(T)) - r*K*np.exp(-r*T)*norm.cdf(d2, 0, 1)
+        elif type == "p":
+            theta_calc = -S*norm.pdf(d1, 0, 1)*sigma/(2*np.sqrt(T)) + r*K*np.exp(-r*T)*norm.cdf(-d2, 0, 1)
+        return theta_calc/365
+    except:
+        print("Please confirm option type, either 'c' for Call or 'p' for Put!")
+
+def rho_calc(r, S, K, T, sigma, type="c"):
+    "Calculate BS price of call/put"
+    d1 = (np.log(S/K) + (r + sigma**2/2)*T)/(sigma*np.sqrt(T))
+    d2 = d1 - sigma*np.sqrt(T)
+    try:
+        if type == "c":
+            rho_calc = K*T*np.exp(-r*T)*norm.cdf(d2, 0, 1)
+        elif type == "p":
+            rho_calc = -K*T*np.exp(-r*T)*norm.cdf(-d2, 0, 1)
+        return rho_calc*0.01
+    except:
+        print("Please confirm option type, either 'c' for Call or 'p' for Put!")
+
+option_type='c'
+#function for BSM with type representing Call or Put Option
+if ch == 1:
+    #print("Option Price is ", round(black_scholes(Rate, Price , Strike, (Time/365), Volatility, OptionType),2))
+    print("       Option Price is : ", round(black_scholes(r, S , K, T, sigma, option_type),2))
+elif ch == 2:    
+    print("       Delta : ", round(delta_calc(r, S, K, T, sigma, option_type),3))
+elif ch == 3:
+    print("       Gamma : ", round(gamma_calc(r, S, K, T, sigma, option_type),3))
+elif ch == 4:
+    print("       Vega : ", round(vega_calc(r, S, K, T, sigma, option_type),3))
+elif ch == 5:
+    print("       Theta: ", round(theta_calc(r, S, K, T, sigma, option_type),3))
+elif ch == 6:
+    print("       Rho  : ", round(rho_calc(r, S, K, T, sigma, option_type),3))
+elif ch == 7:
+    print("Option Price: ", round(black_scholes(r, S, K, T, sigma, option_type),3))
+    print("       Delta: ", round(delta_calc(r, S, K, T, sigma, option_type),3))
+    print("       Gamma: ", round(gamma_calc(r, S, K, T, sigma, option_type),3))
+    print("       Vega : ", round(vega_calc(r, S, K, T, sigma, option_type),3))
+    print("       Theta: ", round(theta_calc(r, S, K, T, sigma, option_type),3))
+    print("       Rho  : ", round(rho_calc(r, S, K, T, sigma, option_type),3))
